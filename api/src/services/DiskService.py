@@ -18,4 +18,5 @@ class DiskService:
         request_url = f"{self.URL}/resources/download?path={video_path}"
         async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(request_url, headers=headers) as response:
-                return await response.json()["href"]
+                response =  await response.json()
+                return response["href"]

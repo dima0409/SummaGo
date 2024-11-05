@@ -1,58 +1,56 @@
 import uuid
-from fileinput import filename
-from urllib.parse import urlparse, parse_qs
 
-import aiohttp
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
+from celery.result import AsyncResult
 
 from src.db.models.TranscribeModel import Transcribe
-from src.routers.v1.DiskRouter import DiskService
-from src.schemas.Transcribe import TranscribeCreateModel
+from src.routers.v1.DiskRouter import disk_service
+from src.schemas.Transcribe import TranscribeCreateModel, TranscribeUpdateModel
+from src.services.celery import start_process
+from src.services.DiskService import DiskService
+from src.services.UserService import UserService
 
 disk_service = DiskService()
+user_service = UserService()
 
 class TranscribeService:
 
-    async def create_transcribe(self, transcribe_data: TranscribeCreateModel, session: AsyncSession, user_id: str):
+    async def create_transcribe(self, transcribe_data: TranscribeCreateModel, session: AsyncSession, oauth_token: str):
+
+        video_download_link = await disk_service.get_video_download_link(user_token=oauth_token,video_path=transcribe_data.file_name)
+
+        user_id = await user_service.get_user_id(oauth_token=oauth_token)
+
         transcribe_data_dict = transcribe_data.model_dump()
+
+        task = start_process.delay(video_download_link, user_id)
+
         new_transcribe_data = Transcribe(**transcribe_data_dict)
-        new_transcribe_data.id =uuid.uuid4().hex
+
+        new_transcribe_data.id =task.id
+
         new_transcribe_data.result = ""
         new_transcribe_data.user_id = user_id
-        new_transcribe_data.task_status = "Downloading"
+        new_transcribe_data.task_status = "Processing"
         session.add(new_transcribe_data)
+
+
+
+
+        start_process.delay(video_download_link, user_id)
         await session.commit()
         return new_transcribe_data
 
-    async def post_process(self,transcribe_data: TranscribeCreateModel, session: AsyncSession, user_id: str, oath_token: str):
-        download_link = await disk_service.get_video_download_link(transcribe_data.file_name, oath_token)
+    async def get_transcribe(self, transcribe_id: str, user_id: str, session: AsyncSession):
 
-        download_info = await self.__download_video(download_link, user_id)
+        transcribe_result = AsyncResult(transcribe_id)
+        if transcribe_result.state == "PENDING":
+            return await session.get(Transcribe, transcribe_id)
 
-        file_name = download_info["file_name"]
+        if transcribe_result.state == "SUCCESS":
+            stm = update(Transcribe).where(Transcribe.id == transcribe_id).values({Transcribe.result: transcribe_result.result, Transcribe.task_status: "Completed"})
+            await session.execute(stm)
+        await session.commit()
 
-        if download_info["is_downloaded"]:
-            print("URA")
-            
-
-    async def __download_video(self, download_link: str,save_folder: str):
-        parsed_link = urlparse(download_link)
-
-        file_name = parse_qs(parsed_link.query)["filename"][0]
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(download_link) as response:
-                if response.status == 200:
-                    with open(f"{save_folder}\\{file_name}", "wb") as f:
-                        chunk_size = 4096
-                        async for data in response.content.iter_chunked(chunk_size):
-                            f.write(await data)
-                            return {
-                                "file_path": f"f{save_folder}\\{file_name}",
-                                "is_downloaded": True
-                            }
-                else:
-                    return {
-                        "file_path": f"f{save_folder}\\{file_name}",
-                        "is_downloaded": False
-                    }
+        return await session.get(Transcribe, transcribe_id)

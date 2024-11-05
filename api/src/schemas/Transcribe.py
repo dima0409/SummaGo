@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class TranscribeModel(BaseModel):
     id: uuid.UUID
-    user_id: uuid.UUID
+    user_id: str
     file_name: str
     task_status: str
     result: str
