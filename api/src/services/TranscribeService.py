@@ -35,10 +35,6 @@ class TranscribeService:
         new_transcribe_data.task_status = "Processing"
         session.add(new_transcribe_data)
 
-
-
-
-        start_process.delay(video_download_link, user_id)
         await session.commit()
         return new_transcribe_data
 
