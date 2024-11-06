@@ -10,7 +10,7 @@ class Transcribe(SQLModel, table=True):
 
     user_id: str
 
-    file_name: str
+    file_path: str
 
     task_status: str
 

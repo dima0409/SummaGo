@@ -1,15 +1,13 @@
-import uuid
-
+from celery.result import AsyncResult
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
-from celery.result import AsyncResult
 
 from src.db.models.TranscribeModel import Transcribe
 from src.routers.v1.DiskRouter import disk_service
-from src.schemas.Transcribe import TranscribeCreateModel, TranscribeUpdateModel
-from src.services.celery import start_process
+from src.schemas.Transcribe import TranscribeCreateModel
 from src.services.DiskService import DiskService
 from src.services.UserService import UserService
+from src.services.celery import start_process
 
 disk_service = DiskService()
 user_service = UserService()
@@ -18,7 +16,7 @@ class TranscribeService:
 
     async def create_transcribe(self, transcribe_data: TranscribeCreateModel, session: AsyncSession, oauth_token: str):
 
-        video_download_link = await disk_service.get_video_download_link(user_token=oauth_token,video_path=transcribe_data.file_name)
+        video_download_link = await disk_service.get_video_download_link(user_token=oauth_token, video_path=transcribe_data.file_path)
 
         user_id = await user_service.get_user_id(oauth_token=oauth_token)
 
