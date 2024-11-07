@@ -98,7 +98,7 @@ cd api
 ```
 Запустите docker compose
 ```shell
-docker compose up
+docker-compose up
 ```
 Сервис будет доступен по адресу:
 ```
