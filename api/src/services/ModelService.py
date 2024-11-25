@@ -1,5 +1,5 @@
 import whisper
-from moviepy.editor import *
+from moviepy import *
 
 
 class ModelService:

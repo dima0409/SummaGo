@@ -26,8 +26,8 @@ user_service = UserService()
                             },
                         }
                         )
-async def create_transcribe(transcribe_data: TranscribeCreateModel, session: AsyncSession = Depends(get_session), authorization: Annotated[str | None, Header()] = None):
-    new_transcribe = await transcribe_service.create_transcribe(transcribe_data, session, oauth_token=authorization)
+async def create_transcribe(transcribe_data: TranscribeCreateModel, session: AsyncSession = Depends(get_session), token: Annotated[str | None, Header()] = None):
+    new_transcribe = await transcribe_service.create_transcribe(transcribe_data, session, oauth_token=token)
     return new_transcribe
 
 @transcribe_router.get("/get",)
