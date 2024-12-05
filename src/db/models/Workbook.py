@@ -14,6 +14,6 @@ class Workbook(Base):
     name = Column(String)
     theme_id = Column(UUID, ForeignKey(Theme.id))
     theme =  relationship("Theme", back_populates="workbooks")
-    user_id=Column(UUID, ForeignKey(User.id))
+    user_id=Column(String, ForeignKey(User.id))
     user = relationship("User",back_populates="workbooks")
     materials = relationship("Material",back_populates="workbook")

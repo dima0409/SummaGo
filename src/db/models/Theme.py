@@ -12,7 +12,7 @@ class Theme(Base):
     __tablename__ = 'themes'
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
     name = Column(String)
-    user_id =  Column(UUID, ForeignKey(User.id))
+    user_id =  Column(String, ForeignKey(User.id))
     user = relationship("User",back_populates="themes")
     workbooks = relationship("Workbook",back_populates="theme")
     science_id = Column(UUID, ForeignKey(Science.id))

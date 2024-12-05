@@ -1,22 +1,25 @@
-from typing import Annotated
-
 import aiohttp
-from fastapi.params import Depends
+from fastapi import HTTPException
 from fastapi.security import HTTPBearer
 
+from src.schemas.user.CheckUserDto import CheckUserDto
+from src.services.UserService import UserService
+
 http_bearer_schema = HTTPBearer(auto_error=True)
+user_service = UserService()
 
+async def get_current_user(token: str):
 
-async def decode_token(user_token: str):
-    headers = {f"Authorization": f"{user_token}"}
+    headers = {f"Authorization": f"{token}"}
     request_url = f"https://login.yandex.ru/info"
-    status_code = 0
+
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get(request_url, headers=headers) as response:
             status_code = response.status
-    if status_code==200:
-        pass
-
-async def get_current_user(token: Annotated[str, Depends(http_bearer_schema)]):
-    user = fake_decode_token(token)
-    return user
+            print(response)
+            if status_code==200:
+                data = await response.json()
+                user = CheckUserDto(id=data["id"],exist=False)
+                return user
+            else:
+                raise HTTPException(detail="User token is not valid",status_code=401)

@@ -17,6 +17,6 @@ class Material(Base):
     status  = Column(String)
     result = Column(String)
     user = relationship("User", back_populates="materials")
-    user_id  = Column(UUID, ForeignKey(User.id))
+    user_id  = Column(String, ForeignKey(User.id))
     workbook_id = Column(Integer, ForeignKey(Workbook.id))
     workbook = relationship("Workbook", back_populates="materials")

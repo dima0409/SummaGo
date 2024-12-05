@@ -1,11 +1,14 @@
 from contextlib import asynccontextmanager
+from sys import prefix
 
 from fastapi import FastAPI
 
-from src.middleware import register_middleware
+
 from src.db.base import init_db
 from src.routers.v1.DiskRouter import disk_router
+from src.routers.v1.ScienceRouter import science_router
 from src.routers.v1.TranscribesRouter import transcribe_router
+from src.routers.v1.UserRouter import user_router
 
 version = "v1"
 
@@ -32,11 +35,12 @@ app = FastAPI(
 )
 
 
-register_middleware(app)
+
 
 
 app.include_router(disk_router, prefix=f"{version_prefix}/disk")
-
+app.include_router(user_router, prefix=f"{version_prefix}/user")
+app.include_router(science_router, prefix=f"{version_prefix}/science")
 app.include_router(transcribe_router, prefix=f"{version_prefix}/transcribe")
 
 
