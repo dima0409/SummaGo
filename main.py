@@ -6,9 +6,12 @@ from fastapi import FastAPI
 
 from src.db.base import init_db
 from src.routers.v1.DiskRouter import disk_router
+from src.routers.v1.MaterialRouter import material_router
 from src.routers.v1.ScienceRouter import science_router
+from src.routers.v1.ThemeRouter import theme_router
 from src.routers.v1.TranscribesRouter import transcribe_router
 from src.routers.v1.UserRouter import user_router
+from src.routers.v1.WorkbookRouter import workbook_router
 
 version = "v1"
 
@@ -40,9 +43,11 @@ app = FastAPI(
 
 app.include_router(disk_router, prefix=f"{version_prefix}/disk")
 app.include_router(user_router, prefix=f"{version_prefix}/user")
+app.include_router(workbook_router, prefix=f"{version_prefix}/workbook")
 app.include_router(science_router, prefix=f"{version_prefix}/science")
 app.include_router(transcribe_router, prefix=f"{version_prefix}/transcribe")
-
+app.include_router(theme_router,prefix=f"{version_prefix}/theme")
+app.include_router(material_router, prefix=f"{version_prefix}/material")
 
 
 

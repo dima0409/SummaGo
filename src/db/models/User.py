@@ -11,9 +11,6 @@ class User(Base):
     id = Column(String, primary_key=True)
     name =  Column(String)
     job = Column(String)
-
-    email = Column(String)
-    login = Column(String)
     workplace = Column(String)
     sciences = relationship("Science",back_populates = "user")
     materials = relationship("Material",back_populates = "user")

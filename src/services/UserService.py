@@ -1,10 +1,10 @@
-import aiohttp
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models.User import User
 from src.schemas.user.CheckUserDto import CheckUserDto
 from src.schemas.user.RegisterUserDto import RegisterUserDto
+from src.schemas.user.UserDto import UserDto
 
 
 class UserService:
@@ -22,14 +22,14 @@ class UserService:
         else:
             res.exist = False
         return res
-    async def register_user(self,new_user: RegisterUserDto, session: AsyncSession):
-        user = await session.execute(select(User).where(User.id==new_user.id))
+    async def register_user(self,ya_user: CheckUserDto,new_user: RegisterUserDto, session: AsyncSession):
+        user = await session.execute(select(User).where(User.id==ya_user.id))
 
         if user.first() is not None:
             raise Exception("User is exists")
-        user = User(job=new_user.job, id=new_user.id, workplace=new_user.workplace, name=new_user.name, login=new_user.login, email=new_user.email)
+        user = User(job=new_user.job, id=ya_user.id, workplace=new_user.workplace, name=new_user.name)
 
         session.add(user)
         await session.commit()
-        return new_user
+        return UserDto(name=user.name, id=user.id, job=user.job, workplace=user.workplace)
 

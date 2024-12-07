@@ -3,10 +3,9 @@ from fastapi import HTTPException
 from fastapi.security import HTTPBearer
 
 from src.schemas.user.CheckUserDto import CheckUserDto
-from src.services.UserService import UserService
 
 http_bearer_schema = HTTPBearer(auto_error=True)
-user_service = UserService()
+
 
 async def get_current_user(token: str):
 

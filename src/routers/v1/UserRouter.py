@@ -21,11 +21,14 @@ async def check_user(token: Annotated[str | None, Header()] = None, session: Asy
 async def register_user(new_user: RegisterUserDto, token: Annotated[str | None, Header()] = None, session: AsyncSession = Depends(get_session)):
     try:
         user = await get_current_user(token)
-        if user is not None and new_user.id==user.id:
-            res = await user_service.register_user(new_user, session)
-            return JSONResponse(content=res.json(),status_code=201)
+        if user is not None:
+
+            res = await user_service.register_user(new_user=new_user, session=session, ya_user=user)
+
+            return JSONResponse(content=res.model_dump(), status_code=201)
         raise HTTPException(detail={"message":"Unauthorized" },status_code=401)
     except HTTPException as e:
         return JSONResponse(content=e.detail, status_code=401)
-    except Exception as e:
-        return JSONResponse(content=e.args, status_code=500)
+
+
+

@@ -1,13 +1,13 @@
 import uuid
 
-from requests import session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sympy.polys.polyconfig import query
 
 from src.db.models.Science import Science
+from src.db.models.Theme import Theme
 from src.schemas.science.CreateScienceDto import CreateScienceDto
 from src.schemas.science.ScienceDto import ScienceDto
+from src.schemas.theme.ThemeDto import ThemeDto
 from src.schemas.user.CheckUserDto import CheckUserDto
 from src.services.UserService import UserService
 
@@ -26,8 +26,16 @@ class ScienceService():
         session.add(new_science)
         await session.commit()
 
-        return ScienceDto(name=science_name, id=science_id)
+        return ScienceDto(name=science_name, id=science_id, themes=[])
+
+
     async def get_all_sciences(self, user: CheckUserDto, session:AsyncSession):
         sciences = await session.execute(select(Science).where(Science.user_id==user.id))
         sciences = sciences.scalars().all()
         return sciences
+
+    async def get_themes_for_science(self, science_id: uuid.UUID, session: AsyncSession):
+        themes = await session.execute(select(Theme).where(Theme.science_id==science_id))
+        themes = themes.scalars().all()
+        return themes
+
