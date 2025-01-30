@@ -2,15 +2,13 @@
 services:
   web:
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
-      - .:/app
+      - /home/easharp/.docker
     environment: 
       DATABASE_URL: "postgresql+asyncpg://summago:pwdsumm@db:5432/summ_db"
       REDIS_URL: "redis://redis:6379/0"
-
     ports:
-      - "8000:8000"
+      - "8001:8001"
 
     depends_on:
       - db
@@ -49,7 +47,7 @@ services:
     command: celery -A src.services.celery.c_app worker --loglevel=INFO
 
     volumes:
-      - .:/app
+      - /home/easharp/.docker
 
     depends_on:
       - redis

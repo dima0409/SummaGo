@@ -1,8 +1,7 @@
 from contextlib import asynccontextmanager
-from sys import prefix
 
 from fastapi import FastAPI
-
+from starlette.middleware.cors import CORSMiddleware
 
 from src.db.base import init_db
 from src.routers.v1.DiskRouter import disk_router
@@ -37,6 +36,18 @@ app = FastAPI(
     redoc_url=f"{version_prefix}/redoc"
 )
 
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 

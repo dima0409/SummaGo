@@ -25,7 +25,7 @@ async def create_theme(new_theme: CreateThemeDto,token: Annotated[str | None, He
         return JSONResponse(jsonable_encoder(theme),status_code=201)
     else:
         raise HTTPException(detail="User does not found in database", status_code=404)
-@theme_router.post("/get_workbooks")
+@theme_router.get("/get_workbooks")
 async def get_all_workbooks(theme_id: uuid.UUID, token: Annotated[str | None, Header()] = None, session: AsyncSession = Depends(get_session)):
     try:
         user = await get_current_user(token)
