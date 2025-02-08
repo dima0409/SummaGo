@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Header, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
@@ -16,10 +17,11 @@ from src.services.WorkbookService import WorkbookService
 workbook_router = APIRouter()
 workbook_service = WorkbookService()
 user_service = UserService()
+security = HTTPBearer()
 
 @workbook_router.post("/create")
-async def create_workbook(new_workbook: CreateWorkbookDto,token: Annotated[str | None, Header()] = None, session: AsyncSession = Depends(get_session)):
-    user = await get_current_user(token)
+async def create_workbook(new_workbook: CreateWorkbookDto,  credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], session: AsyncSession = Depends(get_session)):
+    user = await get_current_user(credentials.credentials)
     user = await user_service.check_user(user,session)
     if user.exist:
         workbook = await workbook_service.create_workbook(new_workbook=new_workbook, session=session,user=user)

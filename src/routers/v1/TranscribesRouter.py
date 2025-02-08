@@ -2,28 +2,25 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi.params import Depends, Query, Header
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.base import get_session
 from src.extension import get_current_user
-from src.schemas.material.CreateMaterialUrlDto import CreateMaterialUrlDto
-from src.schemas.material.MaterialDto import MaterialDto
-from src.schemas.user.UserDto import UserDto
 from src.services.TranscribeService import TranscribeService
 from src.services.UserService import UserService
 
 transcribe_router = APIRouter()
 transcribe_service = TranscribeService()
 user_service = UserService()
-
+security = HTTPBearer()
 
 
 
 @transcribe_router.post("/create",
                         )
-async def create_transcribe( token: Annotated[str | None, Header()] = None, session: AsyncSession = Depends(get_session)):
-    user =await get_current_user(token)
+async def create_transcribe(   credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)], session: AsyncSession = Depends(get_session)):
+    user =await get_current_user(credentials.credentials)
     return user
 
 

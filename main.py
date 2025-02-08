@@ -18,7 +18,7 @@ description = """
 A REST API for a summarize information from video
     """
 
-version_prefix =f"/api/{version}"
+version_prefix = f"/api/{version}"
 
 
 @asynccontextmanager
@@ -26,6 +26,8 @@ async def lifespan(app: FastAPI):
     await init_db()
     yield
     print("Server is stopping")
+
+
 app = FastAPI(
     title="SummaGo",
     description=description,
@@ -33,12 +35,12 @@ app = FastAPI(
     lifespan=lifespan,
     openapi_url=f"{version_prefix}/openapi.json",
     docs_url=f"{version_prefix}/docs",
-    redoc_url=f"{version_prefix}/redoc"
+    redoc_url=f"{version_prefix}/redoc",
 )
 
 origins = [
     "http://localhost",
-    "http://localhost:8000",
+    "http://localhost:8001",
 ]
 
 app.add_middleware(
@@ -50,15 +52,10 @@ app.add_middleware(
 )
 
 
-
-
 app.include_router(disk_router, prefix=f"{version_prefix}/disk")
 app.include_router(user_router, prefix=f"{version_prefix}/user")
 app.include_router(workbook_router, prefix=f"{version_prefix}/workbook")
 app.include_router(science_router, prefix=f"{version_prefix}/science")
 app.include_router(transcribe_router, prefix=f"{version_prefix}/transcribe")
-app.include_router(theme_router,prefix=f"{version_prefix}/theme")
+app.include_router(theme_router, prefix=f"{version_prefix}/theme")
 app.include_router(material_router, prefix=f"{version_prefix}/material")
-
-
-

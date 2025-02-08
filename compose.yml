@@ -6,7 +6,7 @@ services:
       - /home/easharp/.docker
     environment: 
       DATABASE_URL: "postgresql+asyncpg://summago:pwdsumm@db:5432/summ_db"
-      REDIS_URL: "redis://redis:6379/0"
+      REDIS_URL: "redis://redis/0"
     ports:
       - "8001:8001"
 
@@ -35,9 +35,6 @@ services:
   redis:
     image: redis:latest
 
-    ports:
-     - "6379:6379"
-
     networks:
      - app-network
 
@@ -53,7 +50,7 @@ services:
       - redis
 
     environment:
-      REDIS_URL: "redis://redis:6379/0"
+      REDIS_URL: "redis://redis/0"
 
     networks:
       - app-network

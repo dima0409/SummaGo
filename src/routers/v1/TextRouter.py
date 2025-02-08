@@ -8,5 +8,5 @@ text_router = APIRouter()
 text_service = TextModelService()
 @text_router.get("/summarize")
 async def summarize(transcribe_data: str, session: AsyncSession = Depends(get_session)):
-    new_transcribe = await text_service.create_transcribe(transcribe_data, session, oauth_token=token)
+    new_transcribe = await text_service.create_transcribe(transcribe_data, session)
     return new_transcribe
